@@ -1,0 +1,80 @@
+
+//LCD function
+
+sbit rs=P3^2;//regis pin connected to P3.2
+sbit en=P3^3;//enable pin connected to P3.3
+//RW/WR pin connected to ground 
+
+void lcd_delay(unsigned int time)
+{
+	int i,j;
+	for(i=0;i<275;i++)
+	for(j=0;j<time;j++);
+}
+void lcd_cmd(unsigned int command)
+{
+	rs=0;
+	P0=command;
+	en=1;
+  lcd_delay(40);
+	en=0;
+}
+void lcd_data(unsigned char dat)
+{
+	rs=1;
+	P0=dat;
+	en=1;
+  lcd_delay(40);
+	en=0;
+}
+void lcd_init(void)
+{
+	rs=0;
+	en=0;
+  P0=0;
+	
+	lcd_cmd(0x01);
+	lcd_delay(40);
+	lcd_cmd(0x0E);
+	lcd_delay(40);
+	lcd_cmd(0x38);
+	lcd_delay(40);	
+}
+void disp_string(unsigned char *ptr)
+{
+	unsigned char i=0;
+	while(ptr[i]!='\n')
+	{
+		lcd_data(ptr[i]);
+		lcd_delay(1);
+		i++;
+	}
+}
+
+
+Lcd main
+
+#include<reg51.h>
+#include"LCD.c"
+
+void main()
+{
+	unsigned char msg1[]="DAKSHAA",msg2[]="AYUSHI",msg3[]="C4 BATCH";
+	
+	lcd_init();
+	
+	lcd_cmd(0x80);
+	disp_string(msg1);
+	lcd_delay(40);
+	
+	lcd_cmd(0x89);
+	disp_string(msg2);
+	lcd_delay(40);
+	
+	lcd_cmd(0xC5);
+	lcd_delay(40);
+	disp_string(msg3);
+	lcd_delay(40);
+	
+	while(1);
+}
